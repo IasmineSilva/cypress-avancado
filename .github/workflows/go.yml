@@ -1,6 +1,3 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
 name: Integração Contínua
 
 on:
@@ -10,22 +7,24 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout do código
+      uses: actions/checkout@v4
 
-    - name: Set up Go
+    - name: Configurar Go
       uses: actions/setup-go@v4
       with:
         go-version: '1.20'
 
-    - name: Inicia Banco
-    - run: docker compose up -d postgres
+    - name: Subir Banco de Dados
+      run: docker compose up -d postgres
 
-    - name: Lint
-    - run: docker run --rm -itv $(CURDIR):/app -w /app golangci/golangci-lint golangci-lint run controllers/ database/ models/ routes/
+    - name: Análise de Código com GolangCI-Lint
+      run: |
+        docker run --rm -v ${{ github.workspace }}:/app -w /app golangci/golangci-lint \
+        golangci-lint run controllers/ database/ models/ routes/
 
-    - name: Test
-      run: go test -v main_test.go
+    - name: Executar Testes
+      run: go test -v ./...

@@ -20,11 +20,19 @@ func ConectaComBancoDeDados() {
 	nomeBanco := os.Getenv("DB_NAME")
 	portaBanco := os.Getenv("DB_PORT")
 
+	// Validação básica
+	if endereco == "" || usuario == "" || senha == "" || nomeBanco == "" || portaBanco == "" {
+		log.Panic("Erro: Uma ou mais variáveis de ambiente do banco de dados estão ausentes")
+	}
+
 	stringDeConexao := "host=" + endereco + " user=" + usuario + " password=" + senha + " dbname=" + nomeBanco + " port=" + portaBanco + " sslmode=disable"
 	DB, err = gorm.Open(postgres.Open(stringDeConexao))
 	if err != nil {
-		log.Panic("Erro ao conectar com banco de dados")
+		log.Panic("Erro ao conectar com banco de dados: ", err)
 	}
 
-	DB.AutoMigrate(&models.Aluno{})
+	err = DB.AutoMigrate(&models.Aluno{})
+	if err != nil {
+		log.Panic("Erro ao fazer auto-migrate: ", err)
+	}
 }

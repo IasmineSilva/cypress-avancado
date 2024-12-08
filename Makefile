@@ -6,4 +6,4 @@ test:
 start:
 	docker compose up -d
 ci:
-	start lint test
+	start lint tes
